@@ -1,0 +1,19 @@
+-- insert into user values (1001,sysdate, 'Widy', 2,10000);
+-- insert into user values (1002,sysdate, 'Jack', 0,0);
+-- insert into user values (1003,sysdate, 'Jill', 1,5000);
+-- insert into user values (1004,sysdate, 'Jack Jill', 0,0);
+-- insert into user values (1005,sysdate, 'Ram', 0,0);
+-- insert into user values (1006,sysdate, 'Ma', 0,0);
+-- insert into user values (1007,sysdate, 'Muh', 0,0);
+-- insert into user values (1008,sysdate, 'Amad', 0,0);
+-- insert into user values (1009,sysdate, 'Ada', 0,0);
+-- insert into user values (1010,sysdate, 'Idy', 0,0);
+-- insert into user values (1011,sysdate, 'Wild', 0,0);
+-- insert into user values (1012,sysdate, 'Card', 0,0);
+-- -- insert into order_table values (11001, 'Spring Course', 5000, 'Book', 1001);
+-- -- insert into order_table values (11002, 'Spring Boot', 5000, 'Online Course', 1001);
+-- -- insert into order_table values (11003, 'Spring Course', 5000, 'Book', 1003);
+-- insert into order_type values (11101, 'Online Course');
+-- insert into order_type values (11102, 'Book');
+--
+-- -- insert into user_login values (1001, 'mwidyr','sakti123','simple-market');
