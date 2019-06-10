@@ -27,8 +27,8 @@ public class User {
     @ApiModelProperty(notes = "Birthdate should be in the past")
     private Date date;
 
-    @OneToMany(mappedBy = "user")
-    private List<Order> orders;
+//    @OneToMany(mappedBy = "user")
+//    private List<Order> orders;
     private Integer ordersCount;
     private BigDecimal totalPrice;
 
@@ -43,7 +43,7 @@ public class User {
         this.id = id;
         this.name = name;
         this.date = date;
-        this.orders = orders;
+//        this.orders = orders;
         this.ordersCount = ordersCount;
         this.totalPrice = totalPrice;
     }
@@ -55,7 +55,7 @@ public class User {
                     Date date, List<Order> orders) {
         this.name = name;
         this.date = date;
-        this.orders = orders;
+//        this.orders = orders;
     }
 
     public Integer getId() {
@@ -82,13 +82,13 @@ public class User {
         this.date = date;
     }
 
-    public List<Order> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
+//    public List<Order> getOrders() {
+//        return orders;
+//    }
+//
+//    public void setOrders(List<Order> orders) {
+//        this.orders = orders;
+//    }
 
     public Integer getOrdersCount() {
         return ordersCount;
@@ -112,7 +112,7 @@ public class User {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", date=" + date +
-                ", orders=" + orders +
+//                ", orders=" + orders +
                 ", ordersCount=" + ordersCount +
                 ", totalPrice=" + totalPrice +
                 '}';

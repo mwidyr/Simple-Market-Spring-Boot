@@ -5,35 +5,36 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 public class UserDetail {
     @Id
     @GeneratedValue
     private Integer id;
-    @Size(min = 2, message = "Name should have atleast 2 characters")
-    @ApiModelProperty(notes = "name should have 2 char")
-    private String fullname;
     private String email;
-    private Integer mobileNumber;
+    private String username;
+    private String password;
+    private Long mobileNumber;
+    private String fullname;
 
-//    @OneToOne(mappedBy = "userDetail")
-    private Order order;
-
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @MapsId
-//    @JsonIgnore
+    @OneToOne(mappedBy = "userDetail")
     private UserLogin userLogin;
+
+    @OneToMany(mappedBy = "userDetail")
+    private List<OrderDetail> orderDetails;
 
     public UserDetail() {
     }
 
-    public UserDetail(@Size(min = 2, message = "Name should have atleast 2 characters") String fullname, String email, Integer mobileNumber, Order order, UserLogin userLogin) {
-        this.fullname = fullname;
+    public UserDetail(String email, String username, String password, Long mobileNumber, String fullname, UserLogin userLogin, List<OrderDetail> orderDetails) {
         this.email = email;
+        this.username = username;
+        this.password = password;
         this.mobileNumber = mobileNumber;
-        this.order = order;
+        this.fullname = fullname;
         this.userLogin = userLogin;
+        this.orderDetails = orderDetails;
     }
 
     public Integer getId() {
@@ -44,14 +45,6 @@ public class UserDetail {
         this.id = id;
     }
 
-    public String getFullname() {
-        return fullname;
-    }
-
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -60,20 +53,28 @@ public class UserDetail {
         this.email = email;
     }
 
-    public Integer getMobileNumber() {
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Long getMobileNumber() {
         return mobileNumber;
     }
 
-    public void setMobileNumber(Integer mobileNumber) {
+    public void setMobileNumber(Long mobileNumber) {
         this.mobileNumber = mobileNumber;
     }
 
-    public Order getOrder() {
-        return order;
+    public String getFullname() {
+        return fullname;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
     public UserLogin getUserLogin() {
@@ -84,15 +85,33 @@ public class UserDetail {
         this.userLogin = userLogin;
     }
 
+    public List<OrderDetail> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(List<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("UserDetail{");
         sb.append("id=").append(id);
-        sb.append(", fullname='").append(fullname).append('\'');
         sb.append(", email='").append(email).append('\'');
+        sb.append(", username='").append(username).append('\'');
         sb.append(", mobileNumber=").append(mobileNumber);
-        sb.append(", order=").append(order);
+        sb.append(", fullname='").append(fullname).append('\'');
         sb.append(", userLogin=").append(userLogin);
+        sb.append(", orderDetails=").append(orderDetails);
+        sb.append(", password=").append(password);
         sb.append('}');
         return sb.toString();
     }

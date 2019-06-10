@@ -1,59 +1,83 @@
 package com.example.simplemarket.resource;
 
-import com.example.simplemarket.exception.UserNotFoundException;
 import com.example.simplemarket.model.Order;
-import com.example.simplemarket.service.OrderDaoService;
+import com.example.simplemarket.repository.OrderRepository;
+import com.example.simplemarket.util.CommonResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.validation.Valid;
-import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
+@RequestMapping(path = "/api/order")
 public class OrderResource {
+    Logger logger = LoggerFactory.getLogger(ObjectDetailResource.class);
     @Autowired
-    OrderDaoService orderDaoService;
+    OrderRepository orderRepository;
 
-    @GetMapping(path = "/order")
-    public List<Order> retrieveAllOrder(){
-        return orderDaoService.findAll();
+    @GetMapping(path = "/getAll")
+    public CommonResponse getAllOrder(){
+        logger.info("order get all");
+        List<Order> order = orderRepository.findAll();
+        CommonResponse response = new CommonResponse();
+        response.setStatus(true);
+        if(order.isEmpty()){
+            response.setStatus(false);
+            response.setMessage("List Order is null");
+            return response;
+        }
+        response.setObject(order);
+        return response;
     }
 
-    @GetMapping(path="/order/{orderId}")
-    public Resource<Order> retrieveOrder(@PathVariable Integer orderId ){
-        Order Order = orderDaoService.findOne(orderId);
-        if(Order==null) throw  new UserNotFoundException("id-"+orderId);
-        Resource<Order> resource = new Resource<>(Order);
-
-        ControllerLinkBuilder linkTo =
-                linkTo(methodOn(this.getClass()).retrieveAllOrder());
-        resource.add(linkTo.withRel("all-Orders"));
-
-        return resource;
+    @GetMapping(path = "/get/{id}")
+    public CommonResponse getOrder(@PathVariable Integer id){
+        logger.info("order get by id");
+        Optional<Order> orderFind = orderRepository.findById(id);
+        CommonResponse response = new CommonResponse();
+        response.setStatus(true);
+        if(!orderFind.isPresent()){
+            response.setStatus(false);
+            response.setMessage("Order Cant be find!");
+            return response;
+        }
+        Order order = orderFind.get();
+        response.setObject(order);
+        return response;
     }
 
-    @PostMapping(path="/order")
-    public ResponseEntity<Object> saveOrder(@Valid @RequestBody Order order ){
-        Order OrderSave = orderDaoService.saveOrder(order);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(OrderSave.getId()).toUri();
-        return ResponseEntity.created(location).build();
+    @PostMapping(path = "/save")
+    public CommonResponse saveOrder(@RequestBody Order request){
+        logger.info("order save");
+        CommonResponse response = new CommonResponse();
+        if(request == null){
+            response.setStatus(false);
+            response.setMessage("Order Cant be save!");
+            return response;
+        }
+        Order order = orderRepository.save(request);
+        response.setStatus(true);
+        response.setObject(order);
+        return response;
     }
 
-    @DeleteMapping(path="/order/delete/{orderId}")
-    public void deleteOrder(@PathVariable Integer OrderId ){
-        Order Order = orderDaoService.deleteById(OrderId);
-        if(Order==null) throw  new UserNotFoundException("id-"+OrderId);
+    @DeleteMapping(path = "/delete")
+    public CommonResponse deleteOrder(@RequestBody Order request){
+        logger.info("order delete");
+        CommonResponse response = new CommonResponse();
+        if(request == null){
+            response.setStatus(false);
+            response.setMessage("Order Cant be delete!");
+            return response;
+        }
+        Order order = orderRepository.save(request);
+        response.setStatus(true);
+        response.setObject(order);
+        return response;
     }
 }

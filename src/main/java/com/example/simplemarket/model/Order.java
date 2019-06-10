@@ -17,24 +17,12 @@ public class Order {
     private Integer orderCount;
 
 //    @OneToMany(mappedBy = "order")
-    private List<OrderDetail> orderDetails;
-
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @MapsId
-//    @JsonIgnore
-    private UserDetail userDetail;
-
+//    private List<OrderDetail> orderDetails;
+//
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    private User user;
+    private UserDetail userDetail;
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 
     public Order() {
     }
@@ -42,7 +30,7 @@ public class Order {
     public Order(BigDecimal orderTotalPrice, Integer orderCount, List<OrderDetail> orderDetails, UserDetail userDetail) {
         this.orderTotalPrice = orderTotalPrice;
         this.orderCount = orderCount;
-        this.orderDetails = orderDetails;
+//        this.orderDetails = orderDetails;
         this.userDetail = userDetail;
     }
 
@@ -70,13 +58,13 @@ public class Order {
         this.orderCount = orderCount;
     }
 
-    public List<OrderDetail> getOrderDetails() {
-        return orderDetails;
-    }
-
-    public void setOrderDetails(List<OrderDetail> orderDetails) {
-        this.orderDetails = orderDetails;
-    }
+//    public List<OrderDetail> getOrderDetails() {
+//        return orderDetails;
+//    }
+//
+//    public void setOrderDetails(List<OrderDetail> orderDetails) {
+//        this.orderDetails = orderDetails;
+//    }
 
     public UserDetail getUserDetail() {
         return userDetail;
@@ -92,7 +80,7 @@ public class Order {
         sb.append("id=").append(id);
         sb.append(", orderTotalPrice=").append(orderTotalPrice);
         sb.append(", orderCount=").append(orderCount);
-        sb.append(", orderDetails=").append(orderDetails);
+//        sb.append(", orderDetails=").append(orderDetails);
         sb.append(", userDetail=").append(userDetail);
         sb.append('}');
         return sb.toString();

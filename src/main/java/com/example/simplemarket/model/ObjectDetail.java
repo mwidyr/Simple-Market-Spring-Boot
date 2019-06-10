@@ -14,22 +14,32 @@ public class ObjectDetail {
     private String description;
     private BigDecimal price;
     private String type;
+    private String urlImage;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @MapsId
-//    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private OrderDetail orderDetail;
 
     public ObjectDetail() {
     }
 
-    public ObjectDetail(String name, String description, BigDecimal price, String type, OrderDetail orderDetail) {
+    public ObjectDetail(String name, String description, BigDecimal price, String type, String urlImage, OrderDetail orderDetail) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.type = type;
+        this.urlImage = urlImage;
         this.orderDetail = orderDetail;
     }
+
+
+//    public ObjectDetail(String name, String description, BigDecimal price, String type, String urlImage) {
+//        this.name = name;
+//        this.description = description;
+//        this.price = price;
+//        this.type = type;
+//        this.urlImage = urlImage;
+//    }
 
     public Integer getId() {
         return id;
@@ -79,6 +89,14 @@ public class ObjectDetail {
         this.orderDetail = orderDetail;
     }
 
+    public String getUrlImage() {
+        return urlImage;
+    }
+
+    public void setUrlImage(String urlImage) {
+        this.urlImage = urlImage;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("ObjectDetailRepository{");
@@ -88,6 +106,7 @@ public class ObjectDetail {
         sb.append(", price=").append(price);
         sb.append(", type='").append(type).append('\'');
         sb.append(", orderDetail=").append(orderDetail);
+        sb.append(", urlImage=").append(urlImage);
         sb.append('}');
         return sb.toString();
     }

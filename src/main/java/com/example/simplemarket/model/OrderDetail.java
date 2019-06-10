@@ -1,9 +1,12 @@
 package com.example.simplemarket.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 public class OrderDetail {
@@ -12,20 +15,25 @@ public class OrderDetail {
     private Integer id;
     private Integer objectTotal;
     private BigDecimal objectTotalPrice;
-//    @OneToOne(mappedBy = "orderDetail")
-    private ObjectDetail objectDetail;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JsonIgnore
-    private Order order;
+        @OneToMany(mappedBy = "orderDetail")
+//    @Transient
+//    @JsonSerialize
+//    @JsonDeserialize
+    private List<ObjectDetail> objectDetail;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private UserDetail userDetail;
 
     public OrderDetail() {
     }
 
-    public OrderDetail(Integer objectTotal, BigDecimal objectTotalPrice, ObjectDetail objectDetail) {
+    public OrderDetail(Integer objectTotal, BigDecimal objectTotalPrice, List<ObjectDetail> objectDetail, UserDetail userDetail) {
         this.objectTotal = objectTotal;
         this.objectTotalPrice = objectTotalPrice;
         this.objectDetail = objectDetail;
+        this.userDetail = userDetail;
     }
 
     public Integer getId() {
@@ -52,12 +60,20 @@ public class OrderDetail {
         this.objectTotalPrice = objectTotalPrice;
     }
 
-    public ObjectDetail getObjectDetail() {
+    public List<ObjectDetail> getObjectDetail() {
         return objectDetail;
     }
 
-    public void setObjectDetail(ObjectDetail objectDetail) {
+    public void setObjectDetail(List<ObjectDetail> objectDetail) {
         this.objectDetail = objectDetail;
+    }
+
+    public UserDetail getUserDetail() {
+        return userDetail;
+    }
+
+    public void setUserDetail(UserDetail userDetail) {
+        this.userDetail = userDetail;
     }
 
     @Override
@@ -67,6 +83,7 @@ public class OrderDetail {
         sb.append(", objectTotal=").append(objectTotal);
         sb.append(", objectTotalPrice=").append(objectTotalPrice);
         sb.append(", objectDetail=").append(objectDetail);
+        sb.append(", userDetail=").append(userDetail);
         sb.append('}');
         return sb.toString();
     }

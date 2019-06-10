@@ -1,9 +1,8 @@
 package com.example.simplemarket.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 
 @Entity
 public class UserLogin {
@@ -14,7 +13,8 @@ public class UserLogin {
     private String password;
     private String sessionId;
 
-//    @OneToOne(mappedBy = "userLogin")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private UserDetail userDetail;
 
     public UserLogin() {
