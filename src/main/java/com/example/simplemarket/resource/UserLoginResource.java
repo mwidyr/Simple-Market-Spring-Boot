@@ -73,7 +73,7 @@ public class UserLoginResource {
 
     @PostMapping(path="/signup")
     public CommonResponse signup(@RequestBody UserDetail request){
-        logger.info("login user");
+        logger.info("signup user");
         CommonResponse response = new CommonResponse();
         if(request == null){
             response.setMessage("Request Body is null!");

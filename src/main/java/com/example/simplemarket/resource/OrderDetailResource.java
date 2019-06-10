@@ -1,22 +1,26 @@
 package com.example.simplemarket.resource;
 
+import com.example.simplemarket.exception.UserNotFoundException;
 import com.example.simplemarket.model.ObjectDetail;
 import com.example.simplemarket.model.OrderDetail;
 import com.example.simplemarket.model.UserDetail;
 import com.example.simplemarket.repository.ObjectDetailRepository;
 import com.example.simplemarket.repository.OrderDetailRepository;
+import com.example.simplemarket.repository.OrderTypeRepository;
 import com.example.simplemarket.repository.UserDetailRepository;
 import com.example.simplemarket.util.CommonResponse;
 import com.example.simplemarket.util.SaveOrderDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/api/order/order-detail")
@@ -28,6 +32,8 @@ public class OrderDetailResource {
     ObjectDetailRepository objectDetailRepository;
     @Autowired
     UserDetailRepository userDetailRepository;
+    @Autowired
+    OrderTypeRepository orderTypeRepository;
 
     @GetMapping(path = "/getAll")
     public CommonResponse getAllOrder() {
@@ -82,17 +88,30 @@ public class OrderDetailResource {
         //save order to get id
         OrderDetail orderDetail = orderDetailRepository.save(request.getOrderDetail());
         //save object
-        for(ObjectDetail objectDetail:request.getOrderDetail().getObjectDetail()){
-            logger.info("save object = "+objectDetail.toString());
-            objectDetail.setOrderDetail(orderDetail);
+        OrderDetail finalOrderDetail = orderDetail;
+        List<String> orderType = orderTypeRepository.findAll()
+                .stream()
+                .map(result -> result.getOrderType())
+                .collect(Collectors.toList());
+        request.getOrderDetail().getObjectDetail().stream().forEach(objectDetail -> {
+            logger.info("save object = " + objectDetail.toString());
+            ObjectDetail finalObjectDetail = objectDetail;
+            if (orderType.stream().noneMatch(data -> data.equals(finalObjectDetail.getType()))) {
+                throw new UserNotFoundException("Order Type is Wrong! Please use this type instead : " + orderType.toString());
+            }
+            objectDetail.setOrderDetail(finalOrderDetail);
             objectDetail.setId(null);
             objectDetail = objectDetailRepository.save(objectDetail);
             //save order and add object
-            orderDetail.setObjectTotal(orderDetail.getObjectTotal() == null ? 1 : orderDetail.getObjectTotal() + 1);
-            orderDetail.setObjectTotalPrice(orderDetail.getObjectTotalPrice() == null ? BigDecimal.ZERO
-                    : orderDetail.getObjectTotalPrice().add(objectDetail.getPrice()));
-        }
-        orderDetail.setUserDetail(request.getUserDetail());
+            finalOrderDetail.setObjectTotal(finalOrderDetail.getObjectTotal() == null ? 1 : finalOrderDetail.getObjectTotal() + 1);
+            logger.info("object Total price == "+finalOrderDetail.getObjectTotalPrice());
+            logger.info("object  price == "+objectDetail.getPrice());
+            finalOrderDetail.setObjectTotalPrice(finalOrderDetail.getObjectTotalPrice() == null ? BigDecimal.ZERO.add(objectDetail.getPrice())
+                    : finalOrderDetail.getObjectTotalPrice().add(objectDetail.getPrice()));
+        });
+        UserDetail userDetail = userDetailRepository.findByUsername(request.getUserDetail().getUsername());
+        BeanUtils.copyProperties(request.getUserDetail(), userDetail, getNullPropertyNames(request.getUserDetail()));
+        orderDetail.setUserDetail(userDetail);
         orderDetail = orderDetailRepository.save(orderDetail);
         response.setStatus(true);
         response.setObject(orderDetail);
@@ -112,5 +131,24 @@ public class OrderDetailResource {
         response.setStatus(true);
         response.setObject(orderDetail);
         return response;
+    }
+
+    /**
+     * Returns an array of null properties of an object
+     *
+     * @param source
+     * @return
+     */
+    public static String[] getNullPropertyNames (Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<String>();
+        for(java.beans.PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) emptyNames.add(pd.getName());
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
     }
 }
