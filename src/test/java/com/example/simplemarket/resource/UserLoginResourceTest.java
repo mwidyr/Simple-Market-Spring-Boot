@@ -54,6 +54,7 @@ public class UserLoginResourceTest {
         assertNotNull(response);
         assertTrue(response.getStatus());
         assertEquals("Success logout!", response.getMessage());
+
         when(userLoginRepository.findByUsername(username)).thenReturn(null);
         response = userLoginResource.logout(username);
         assertNotNull(response);

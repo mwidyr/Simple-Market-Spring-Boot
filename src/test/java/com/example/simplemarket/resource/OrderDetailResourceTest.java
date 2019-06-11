@@ -1,7 +1,9 @@
 package com.example.simplemarket.resource;
 
+import com.example.simplemarket.exception.UserNotFoundException;
 import com.example.simplemarket.model.ObjectDetail;
 import com.example.simplemarket.model.OrderDetail;
+import com.example.simplemarket.model.OrderType;
 import com.example.simplemarket.model.UserDetail;
 import com.example.simplemarket.repository.ObjectDetailRepository;
 import com.example.simplemarket.repository.OrderDetailRepository;
@@ -50,6 +52,7 @@ public class OrderDetailResourceTest {
     List<ObjectDetail> objdetails = new ArrayList<>();
     OrderDetail orderDetail = new OrderDetail();
     List<OrderDetail> orderList = new ArrayList<>();
+    List<OrderType> orderTypes = new ArrayList<>();
 
     @Before
     public void setup() {
@@ -77,6 +80,11 @@ public class OrderDetailResourceTest {
         orderDetail.setObjectDetail(objdetails);
         orderDetail.setId(1);
         orderList.add(orderDetail);
+
+        orderTypes.add(new OrderType("Shirt"));
+        orderTypes.add(new OrderType("Hat"));
+        orderTypes.add(new OrderType("Shoes"));
+        orderTypes.add(new OrderType("Pants"));
     }
 
     @Test
@@ -121,7 +129,7 @@ public class OrderDetailResourceTest {
         assertEquals(orderDetail, response.getObject());
     }
 
-    @Test
+    @Test(expected = UserNotFoundException.class)
     public void saveOrder() {
         SaveOrderDetail saveOrderDetail = new SaveOrderDetail();
         CommonResponse response = orderDetailResource.saveOrder(null);
@@ -137,58 +145,33 @@ public class OrderDetailResourceTest {
         assertNotNull(response);
         assertFalse(response.getStatus());
         assertEquals("Order Detail is null", response.getMessage());
+        saveOrderDetail.setOrderDetail(orderDetail);
+        when(orderDetailRepository.save(saveOrderDetail.getOrderDetail())).thenReturn(orderDetail);
+        when(objectDetailRepository.save(any(ObjectDetail.class))).thenReturn(objectDetail);
+        when(orderTypeRepository.findAll()).thenReturn(orderTypes);
+        when(userDetailRepository.findByUsername(saveOrderDetail.getUserDetail().getUsername())).thenReturn(userDetail);
+        response = orderDetailResource.saveOrder(saveOrderDetail);
+        assertNotNull(response);
+        assertTrue(response.getStatus());
+        assertEquals(orderDetail, response.getObject());
+        objectDetail = new ObjectDetail();
+        objectDetail.setId(2);
+        objectDetail.setDescription(description);
+        objectDetail.setName(name);
+        objectDetail.setPrice(BigDecimal.valueOf(50000));
+        objectDetail.setType("lala");
+        objectDetail.setUrlImage(urlImage);
+
+        objdetails.clear();
+        objdetails.add(objectDetail);
+
+        orderDetail = new OrderDetail();
+        orderDetail.setUserDetail(userDetail);
+        orderDetail.setObjectTotalPrice(BigDecimal.valueOf(50000));
+        orderDetail.setObjectTotal(1);
+        orderDetail.setObjectDetail(objdetails);
+        orderDetail.setId(2);
+        saveOrderDetail.setOrderDetail(orderDetail);
+        response = orderDetailResource.saveOrder(saveOrderDetail);
     }
-
-//    @PostMapping(path = "/save")
-//    public CommonResponse saveOrder(@RequestBody SaveOrderDetail request) {
-//        logger.info("order detail save");
-//        CommonResponse response = new CommonResponse();
-//        if (request == null) {
-//            response.setStatus(false);
-//            response.setMessage("Order Detail Cant be save!");
-//            return response;
-//        }
-//        if (request.getUserDetail() == null) {
-//            response.setStatus(false);
-//            response.setMessage("User Detail is null");
-//            return response;
-//        }
-//        if (request.getOrderDetail() == null) {
-//            response.setStatus(false);
-//            response.setMessage("Order Detail is null");
-//            return response;
-//        }
-//        //save order to get id
-//        OrderDetail orderDetail = orderDetailRepository.save(request.getOrderDetail());
-//        //save object
-//        OrderDetail finalOrderDetail = orderDetail;
-//        List<String> orderType = orderTypeRepository.findAll()
-//                .stream()
-//                .map(result -> result.getOrderType())
-//                .collect(Collectors.toList());
-//        request.getOrderDetail().getObjectDetail().stream().forEach(objectDetail -> {
-//            logger.info("save object = " + objectDetail.toString());
-//            ObjectDetail finalObjectDetail = objectDetail;
-//            if (orderType.stream().noneMatch(data -> data.equals(finalObjectDetail.getType()))) {
-//                if (orderType.stream().noneMatch(data -> data.equals(finalObjectDetail.getType()))) {
-//                    throw new UserNotFoundException("Order Type is Wrong! Please use this type instead : " + orderType.toString());
-//                }
-//                throw new UserNotFoundException("Order Type is Wrong! Please use this type instead : " + orderType.toString());
-//            }
-//            objectDetail.setOrderDetail(finalOrderDetail);
-//            objectDetail.setId(null);
-//            objectDetail = objectDetailRepository.save(objectDetail);
-//            //save order and add object
-//            finalOrderDetail.setObjectTotal(finalOrderDetail.getObjectTotal() == null ? 1 : finalOrderDetail.getObjectTotal() + 1);
-//            finalOrderDetail.setObjectTotalPrice(finalOrderDetail.getObjectTotalPrice() == null ? BigDecimal.ZERO
-//                    : finalOrderDetail.getObjectTotalPrice().add(objectDetail.getPrice()));
-//        });
-//        orderDetail.setUserDetail(request.getUserDetail());
-//        orderDetail = orderDetailRepository.save(orderDetail);
-//        response.setStatus(true);
-//        response.setObject(orderDetail);
-//        return response;
-//    }
-//
-
 }
